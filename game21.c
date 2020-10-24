@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 void initData();
-int dealCards();
+void dealCards();
 void getWeight(int card,int player);
 void printPlayer(int player);
 int findKing();
@@ -49,8 +49,8 @@ void initData() {
         cardsNumber[i]=4;
     }
 }
-int dealCards() {
-    int i,card,flag=0;
+void dealCards() {
+    int i,card;
     srand(time(NULL));
     //给8个玩家发牌
     for(i=0; i<8; ++i) {
@@ -61,11 +61,9 @@ int dealCards() {
         //牌数减一
         --cardsNumber[card];
         if(players[i].chose==1||players[i].weight>21)continue;
-        flag=1;
         players[i].handCards[players[i].length++]=card;
         getWeight(card,i);
     }
-    return flag;
 }
 void getWeight(int card,int player) {
     if(card>8) {
@@ -142,24 +140,29 @@ int findKing() {
     return result;
 }
 void autoChose(int player) {
-    if(players[player].weight<17 && players[player].length<6) {
+    if(players[player].weight<21 && players[player].length<6) {
         players[player].chose=0;
     } else players[player].chose=1;
 }
 void gameStart(int player){
-	int i;
+	int i,flag;
     printf("==========游戏开始==========\n");
-    while(dealCards()) {
+    while(1) {
+        dealCards();
         printPlayer(player);
+        flag=1;
         for(i=0; i<8; ++i) {
             if(i==player)continue;
             autoChose(i);
+            if(players[i].chose==0)flag=0;
         }
         if(players[player].weight<21&&players[player].chose==0&&players[player].length<6) {
             printf("请选择：0要牌 1停牌\n");
             scanf("%d",&players[player].chose);
         } else players[player].chose=1;
+        if(players[player].chose==0)flag=0;
         printChose();
+        if(flag)break;
     }
     printResult(player);
 }
